@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JC's E-Commerce</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet"> <!-- Google Font -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        header {
+            background-color: #343a40;
+            color: white;
+            padding: 1rem;
+            font-size: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+        .header-title {
+            font-family: 'Poppins', sans-serif; /* Use the new font */
+            font-size: 2rem; /* Adjust size as needed */
+        }
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.8rem; /* Smaller font size */
+            padding: 10px 15px;
+            border-radius: 5px;
+            background-color: #28a745;
+            transition: background-color 0.3s, transform 0.3s; /* Animation */
+        }
+        .nav-links a:hover {
+            background-color: #218838;
+            transform: scale(1.1); /* Hover animation */
+        }
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+        .product {
+            background: rgb(10, 253, 225);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: 0.3s;
+            position: relative;
+        }
+        .product:hover {
+            transform: scale(1.05);
+        }
+        .product img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .product button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .product .product-info {
+            display: block; /* Change to block to show it */
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            opacity: 0; /* Initially hidden */
+            transition: opacity 0.3s; /* Fade effect */
+        }
+        .product:hover .product-info {
+            opacity: 1; /* Show on hover */
+        }
+        .recommendations {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .recommendations.show {
+            display: block;
+        }
+        .cart {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 20px auto;
+            display: none; /* Initially hidden */
+        }
+        .cart h2 {
+            margin: 0;
+        }
+        .cart ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .user-info {
+            font-size: 1rem;
+            color: white;
+            margin-right: 15px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <span class="header-title">JC's E-Commerce</span> <!-- Updated title class -->
+            <div class="nav-links">
+                <a href="http://127.0.0.1:3000/website/website.html">Home</a>
+                <a href="http://127.0.0.1:3000/website/starting page.html">About Us</a>
+                <a href="contact.html">Contact Us</a> <!-- Contact Us link -->
+            </div>
+        </div>
+        <div class="nav-links">
+            <span class="user-info hidden" id="user-info"></span>
+            <a href="login.html" id="login-link">Login</a>
+            <a href="signup.html" id="signup-link">Sign Up</a>
+            <button class="hidden" id="logout-btn" onclick="logout()">Logout</button>
+            <button onclick="accessAdmin()">Admin</button>
+            <button id="cart-btn" onclick="toggleCart()">Shopping Cart</button>
+        </div>
+    </header>
+    
+    <div class="container" id="product-list"></div>
+    
+    <div class="cart" id="cart">
+        <h2>Shopping Cart</h2>
+        <ul id="cart-items"></ul>
+        <p><strong>Total:</strong> $<span id="total-price">0</span></p>
+        <button id="cashout-btn" class="hidden" onclick="cashOut()">Cash Out</button>
+    </div>
+    
+    <script>
+        const products = [
+            { id: 1, name: "Stylish Jacket", price: 49, img: "images/download.jpeg", info: "A stylish jacket perfect for casual outings.", similar: [2, 3] },
+            { id: 2, name: "Cool Sneakers", price: 69, img: "images/download (1).jpeg", info: "Comfortable sneakers for everyday wear.", similar: [1, 4] },
+            { id: 3, name: "Modern Watch", price: 99, img: "images/download (2).jpeg", info: "A sleek and modern watch for all occasions.", similar: [1, 4] },
+            { id: 4, name: "Elegant Bag", price: 89, img: "images/download (3).jpeg", info: "An elegant bag for a sophisticated look.", similar: [2, 3] }
+        ];
+        
+        const productList = document.getElementById("product-list");
+        const cartItems = document.getElementById("cart-items");
+        const totalPrice = document.getElementById("total-price");
+        const userInfo = document.getElementById("user-info");
+        const loginLink = document.getElementById("login-link");
+        const signupLink = document.getElementById("signup-link");
+        const logoutBtn = document.getElementById("logout-btn");
+        const cashOutBtn = document.getElementById("cashout-btn");
+        const cart = document.getElementById("cart");
+
+        let cartArray = [];
+
+        // Admin access
+        function accessAdmin() {
+            const password = prompt("Enter Admin PIN:");
+            if (password === "1234") { // Replace "1234" with your desired PIN
+                window.location.href = "admin.html"; // Redirect to admin dashboard
+            } else {
+                alert("Incorrect PIN. Access denied.");
+            }
+        }
+
+        // Render products
+        function renderProducts() {
+            productList.innerHTML = ""; // Clear existing products
+            products.forEach(product => {
+                const productDiv = document.createElement("div");
+                productDiv.classList.add("product");
+                productDiv.innerHTML = `
+                    <img src="${product.img}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>$${product.price}</p>
+                    <div class="product-info">
+                        <p>${product.info}</p>
+                    </div>
+                    <button onclick="addToCart(${product.id})">Add to Cart</button>
+                    <div class="recommendations" id="recommendations-${product.id}"></div>
+                `;
+                productDiv.addEventListener("click", (e) => {
+                    if (e.target.tagName !== "BUTTON") {
+                        showRecommendations(product.id);
+                    }
+                });
+                productList.appendChild(productDiv);
+            });
+        }
+
+        // Show recommendations
+        function showRecommendations(productId) {
+            const recommendationsDiv = document.getElementById(`recommendations-${productId}`);
+            const product = products.find(p => p.id === productId);
+
+            if (recommendationsDiv.classList.contains("show")) {
+                recommendationsDiv.classList.remove("show");
+                recommendationsDiv.innerHTML = "";
+            } else {
+                recommendationsDiv.innerHTML = product.similar
+                    .map(id => {
+                        const similarProduct = products.find(p => p.id === id);
+                        return `
+                            <div class="product">
+                                <img src="${similarProduct.img}" alt="${similarProduct.name}">
+                                <h3>${similarProduct.name}</h3>
+                                <p>$${similarProduct.price}</p>
+                            </div>
+                        `;
+                    })
+                    .join("");
+                recommendationsDiv.classList.add("show");
+            }
+        }
+
+        // Add product to cart
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            cartArray.push(product);
+            updateCart();
+            alert(`${product.name} has been added to your cart!`); // Notification
+        }
+
+        // Update cart
+        function updateCart() {
+            cartItems.innerHTML = "";
+            let total = 0;
+            cartArray.forEach((item, index) => {
+                total += item.price;
+                const li = document.createElement("li");
+                li.innerHTML = `${item.name} - $${item.price} <button onclick="removeFromCart(${index})">❌</button>`;
+                cartItems.appendChild(li);
+            });
+            totalPrice.innerText = total;
+
+            if (cartArray.length > 0) {
+                cashOutBtn.classList.remove("hidden");
+            } else {
+                cashOutBtn.classList.add("hidden");
+            }
+        }
+
+        // Remove product from cart
+        function removeFromCart(index) {
+            cartArray.splice(index, 1);
+            updateCart();
+        }
+
+        // Cash out
+        function cashOut() {
+            // Save the cart items and total price to local storage
+            localStorage.setItem('cartItems', JSON.stringify(cartArray));
+            localStorage.setItem('totalPrice', totalPrice.innerText);
+            
+            // Redirect to the payment page
+            window.location.href = 'payment.html'; // Ensure this matches the filename of your payment page
+        }
+
+        // Toggle cart display
+        function toggleCart() {
+            if (cart.style.display === "none" || cart.style.display === "") {
+                cart.style.display = "block";
+            } else {
+                cart.style.display = "none";
+            }
+        }
+
+        // Check if user is logged in
+        function checkUserLogin() {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            if (loggedInUser) {
+                userInfo.innerText = `Hello, ${loggedInUser}`;
+                userInfo.classList.remove("hidden");
+                loginLink.classList.add("hidden");
+                signupLink.classList.add("hidden");
+                logoutBtn.classList.remove("hidden");
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.reload();
+        }
+
+        // Render products on page load
+        window.onload = function() {
+            renderProducts();
+            checkUserLogin();
+        };
+    </script>
+</body>
+</html>

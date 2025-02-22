@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* Header Styles */
+        header {
+            background-color: #343a40;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        header button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        header button:hover {
+            background-color: #218838;
+        }
+
+        /* Container Styles */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .form-container h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #343a40;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-container button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-container button:hover {
+            background-color: #218838;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #343a40;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Toast Notification Styles */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+            animation: fadeInOut 3s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            10%, 90% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin Dashboard</h1>
+        <button onclick="window.location.href='index.html'">Back to Store</button>
+    </header>
+
+    <div class="container">
+        <!-- Add Product Form -->
+        <div class="form-container">
+            <h2>Add New Product</h2>
+            <input type="text" id="product-name" placeholder="Product Name">
+            <input type="number" id="product-price" placeholder="Price">
+            <input type="number" id="product-stock" placeholder="Stock">
+            <button onclick="addProduct()">Add Product</button>
+        </div>
+
+        <!-- Update Product Form -->
+        <div class="form-container">
+            <h2>Update Product</h2>
+            <input type="number" id="update-id" placeholder="Product ID">
+            <input type="text" id="update-name" placeholder="New Name">
+            <input type="number" id="update-price" placeholder="New Price">
+            <input type="number" id="update-stock" placeholder="New Stock">
+            <button onclick="updateProduct()">Update Product</button>
+        </div>
+
+        <!-- Delete Product Form -->
+        <div class="form-container">
+            <h2>Delete Product</h2>
+            <input type="number" id="delete-id" placeholder="Product ID">
+            <button onclick="deleteProduct()">Delete Product</button>
+        </div>
+
+        <!-- Orders Table -->
+        <h2>Orders</h2>
+        <table id="orders-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Items</th>
+                    <th>Total</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <!-- Stock Levels Table -->
+        <h2>Stock Levels</h2>
+        <table id="stock-table">
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">Stock has been successfully updated!</div>
+
+    <script>
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.textContent = message;
+            toast.classList.add("show");
+
+            // Hide the toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        // Fetch and display data
+        async function fetchData() {
+            // Fetch orders
+            const ordersResponse = await fetch("http://localhost:5000/api/orders");
+            const orders = await ordersResponse.json();
+            const ordersTable = document.querySelector("#orders-table tbody");
+            ordersTable.innerHTML = orders.map(order => `
+                <tr>
+                    <td>${order.timestamp}</td>
+                    <td>${order.items.map(item => item.name).join(", ")}</td>
+                    <td>$${order.total}</td>
+                    <td>${order.timestamp}</td>
+                </tr>
+            `).join("");
+
+            // Fetch stock levels
+            const stockResponse = await fetch("http://localhost:5000/api/stock");
+            const stock = await stockResponse.json();
+            const stockTable = document.querySelector("#stock-table tbody");
+            stockTable.innerHTML = stock.map(product => `
+                <tr>
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>$${product.price}</td>
+                    <td>${product.stock}</td>
+                </tr>
+            `).join("");
+        }
+
+        // Add Product
+        async function addProduct() {
+            const name = document.getElementById("product-name").value;
+            const price = parseFloat(document.getElementById("product-price").value);
+            const stock = parseInt(document.getElementById("product-stock").value);
+
+            const response = await fetch("http://localhost:5000/api/products", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, price, stock }),
+            });
+
+            if (response.ok) {
+                showToast("Product added successfully!");
+                fetchData();
+            } else {
+                alert("Failed to add product.");
+            }
+        }
+
+        // Update Product
+        async function updateProduct() {
+            const id = parseInt(document.getElementById("update-id").value);
+            const name = document.getElementById("update-name").value;
+            const price = parseFloat(document.getElementById("update-price").value);
+            const stock = parseInt(document.getElementById("update-stock").value);
+
+            const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, price, stock }),
+            });
+
+            if (response.ok) {
+                showToast("Product updated successfully!");
+                fetchData();
+            } else {
+                alert("Failed to update product.");
+            }
+        }
+
+        // Delete Product
+        async function deleteProduct() {
+            const id = parseInt(document.getElementById("delete-id").value);
+
+            const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                showToast("Product deleted successfully!");
+                fetchData();
+            } else {
+                alert("Failed to delete product.");
+            }
+        }
+
+        // Refresh data every 5 seconds
+        setInterval(fetchData, 5000);
+        fetchData();
+    </script>
+</body>
+</html>

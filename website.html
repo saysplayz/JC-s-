@@ -17,32 +17,34 @@
             padding: 1rem;
             font-size: 1.5rem;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            align-items: flex-start;
             padding: 15px 20px;
         }
         .nav-links {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
+            margin-top: 10px;
         }
         .nav-links a {
             color: white;
             text-decoration: none;
-            font-size: 0.8rem; /* Smaller font size */
+            font-size: 0.9rem;
             padding: 10px 15px;
             border-radius: 5px;
             background-color: #28a745;
-            transition: background-color 0.3s, transform 0.3s; /* Animation */
+            transition: background-color 0.3s, transform 0.3s;
         }
         .nav-links a:hover {
             background-color: #218838;
-            transform: scale(1.1); /* Hover animation */
+            transform: scale(1.1);
         }
         .container {
             max-width: 1000px;
             margin: 20px auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 20px;
             padding: 20px;
         }
@@ -75,7 +77,7 @@
             margin-top: 10px;
         }
         .product .product-info {
-            display: block; /* Change to block to show it */
+            display: block;
             position: absolute;
             top: 100%;
             left: 0;
@@ -85,11 +87,11 @@
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             z-index: 10;
-            opacity: 0; /* Initially hidden */
-            transition: opacity 0.3s; /* Fade effect */
+            opacity: 0;
+            transition: opacity 0.3s;
         }
         .product:hover .product-info {
-            opacity: 1; /* Show on hover */
+            opacity: 1;
         }
         .recommendations {
             display: none;
@@ -111,7 +113,7 @@
             border-radius: 10px;
             max-width: 500px;
             margin: 20px auto;
-            display: none; /* Initially hidden */
+            display: none;
         }
         .cart h2 {
             margin: 0;
@@ -128,6 +130,28 @@
         .hidden {
             display: none;
         }
+        
+        @media (max-width: 600px) {
+            header {
+                font-size: 1.2rem;
+            }
+            .nav-links a {
+                font-size: 0.8rem;
+                padding: 8px 10px;
+            }
+            .product {
+                padding: 10px;
+            }
+            .product h3 {
+                font-size: 1rem;
+            }
+            .product p {
+                font-size: 0.9rem;
+            }
+            .cart {
+                width: 90%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -137,7 +161,7 @@
             <div class="nav-links">
                 <a href="http://127.0.0.1:3000/website/website.html">Home</a>
                 <a href="http://127.0.0.1:3000/website/starting page.html">About Us</a>
-                <a href="contact.html">Contact Us</a> <!-- Contact Us link -->
+                <a href="contact.html">Contact Us</a>
             </div>
         </div>
         <div class="nav-links">
@@ -179,17 +203,15 @@
 
         let cartArray = [];
 
-        // Admin access
         function accessAdmin() {
             const password = prompt("Enter Admin PIN:");
-            if (password === "1234") { // Replace "1234" with your desired PIN
-                window.location.href = "admin.html"; // Redirect to admin dashboard
+            if (password === "1234") {
+                window.location.href = "admin.html";
             } else {
                 alert("Incorrect PIN. Access denied.");
             }
         }
 
-        // Render products
         function renderProducts() {
             products.forEach(product => {
                 const productDiv = document.createElement("div");
@@ -213,7 +235,6 @@
             });
         }
 
-        // Show recommendations
         function showRecommendations(productId) {
             const recommendationsDiv = document.getElementById(`recommendations-${productId}`);
             const product = products.find(p => p.id === productId);
@@ -238,15 +259,13 @@
             }
         }
 
-        // Add product to cart
         function addToCart(productId) {
             const product = products.find(p => p.id === productId);
             cartArray.push(product);
             updateCart();
-            alert(`${product.name} has been added to your cart!`); // Notification
+            alert(`${product.name} has been added to your cart!`);
         }
 
-        // Update cart
         function updateCart() {
             cartItems.innerHTML = "";
             let total = 0;
@@ -265,23 +284,17 @@
             }
         }
 
-        // Remove product from cart
         function removeFromCart(index) {
             cartArray.splice(index, 1);
             updateCart();
         }
 
-        // Cash out
         function cashOut() {
-            // Save the cart items and total price to local storage
             localStorage.setItem('cartItems', JSON.stringify(cartArray));
             localStorage.setItem('totalPrice', totalPrice.innerText);
-            
-            // Redirect to the payment page
-            window.location.href = 'payment.html'; // Ensure this matches the filename of your payment page
+            window.location.href = 'payment.html';
         }
 
-        // Toggle cart display
         function toggleCart() {
             if (cart.style.display === "none" || cart.style.display === "") {
                 cart.style.display = "block";
@@ -290,7 +303,6 @@
             }
         }
 
-        // Check if user is logged in
         function checkUserLogin() {
             const loggedInUser = localStorage.getItem('loggedInUser');
             if (loggedInUser) {
@@ -302,7 +314,6 @@
             }
         }
 
-        // Logout
         function logout() {
             localStorage.removeItem('loggedInUser');
             window.location.reload();

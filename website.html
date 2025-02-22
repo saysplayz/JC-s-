@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JC's E-Commerce</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet"> <!-- Google Font -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,10 +20,6 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
-        }
-        .header-title {
-            font-family: 'Poppins', sans-serif; /* Use the new font */
-            font-size: 2rem; /* Adjust size as needed */
         }
         .nav-links {
             display: flex;
@@ -138,7 +133,7 @@
 <body>
     <header>
         <div style="display: flex; align-items: center; gap: 20px;">
-            <span class="header-title">JC's E-Commerce</span> <!-- Updated title class -->
+            <span><u>JC's E-Commerce</u></span>
             <div class="nav-links">
                 <a href="http://127.0.0.1:3000/website/website.html">Home</a>
                 <a href="http://127.0.0.1:3000/website/starting page.html">About Us</a>
@@ -166,10 +161,10 @@
     
     <script>
         const products = [
-            { id: 1, name: "Stylish Jacket", price: 49, img: "images/download.jpeg", info: "A stylish jacket perfect for casual outings.", similar: [2, 3] },
-            { id: 2, name: "Cool Sneakers", price: 69, img: "images/download (1).jpeg", info: "Comfortable sneakers for everyday wear.", similar: [1, 4] },
-            { id: 3, name: "Modern Watch", price: 99, img: "images/download (2).jpeg", info: "A sleek and modern watch for all occasions.", similar: [1, 4] },
-            { id: 4, name: "Elegant Bag", price: 89, img: "images/download (3).jpeg", info: "An elegant bag for a sophisticated look.", similar: [2, 3] }
+            { id: 1, name: "Stylish Jacket", price: 49, img: "download.jpeg", info: "A stylish jacket perfect for casual outings.", similar: [2, 3] },
+            { id: 2, name: "Cool Sneakers", price: 69, img: "download (1).jpeg", info: "Comfortable sneakers for everyday wear.", similar: [1, 4] },
+            { id: 3, name: "Modern Watch", price: 99, img: "download (2).jpeg", info: "A sleek and modern watch for all occasions.", similar: [1, 4] },
+            { id: 4, name: "Elegant Bag", price: 89, img: "download (3).jpeg", info: "An elegant bag for a sophisticated look.", similar: [2, 3] }
         ];
         
         const productList = document.getElementById("product-list");
@@ -196,7 +191,6 @@
 
         // Render products
         function renderProducts() {
-            productList.innerHTML = ""; // Clear existing products
             products.forEach(product => {
                 const productDiv = document.createElement("div");
                 productDiv.classList.add("product");
@@ -314,11 +308,8 @@
             window.location.reload();
         }
 
-        // Render products on page load
-        window.onload = function() {
-            renderProducts();
-            checkUserLogin();
-        };
+        renderProducts();
+        checkUserLogin();
     </script>
 </body>
 </html>
